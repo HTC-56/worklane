@@ -344,6 +344,7 @@ export class Queue {
       .run(note, JSON.stringify([...job.errorTrail, note]), now, now, jobId);
 
     this.clearWorkerClaim(workerId);
+    this._cascadeCancelChildren(jobId);
     return this.getById(jobId);
   }
 
@@ -373,6 +374,7 @@ export class Queue {
         )
         .run(now, now, jobId);
       if (job.workerId) this.clearWorkerClaim(job.workerId);
+      this._cascadeCancelChildren(jobId);
     }
 
     return { jobId, signal: "NONE", wasRunning: false };
@@ -553,6 +555,31 @@ export class Queue {
     const capped = Math.min(raw, this.config.maxBackoffMs);
     const jitter = Math.random() * Math.min(capped, this.config.baseBackoffMs);
     return Math.floor(capped + jitter);
+  }
+
+  /**
+   * When a job is CANCELLED, every direct child that isn't already terminal
+   * also flips to CANCELLED. Terminal states (SUCCEEDED, DEAD_LETTER,
+   * CANCELLED) are left alone. One level only — no recursion.
+   */
+  private _cascadeCancelChildren(parentId: number): void {
+    const now = Date.now();
+    this.db
+      .prepare(
+        `UPDATE jobs
+            SET state = 'CANCELLED', last_error = ?, error_trail = ?,
+                updated_at = ?, finished_at = ?,
+                lease_until = NULL, worker_id = NULL, run_after = NULL
+          WHERE parent_id = ?
+            AND state NOT IN ('SUCCEEDED', 'DEAD_LETTER', 'CANCELLED')`,
+      )
+      .run(
+        `cancelled (parent ${parentId})`,
+        JSON.stringify([`cancelled (parent ${parentId})`]),
+        now,
+        now,
+        parentId,
+      );
   }
 
   private clearWorkerClaim(workerId: string): void {
