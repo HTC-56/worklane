@@ -22,6 +22,17 @@
   bumps one tier and the deviation is recorded in docs/PROCESS.md. The
   outcome is reported honestly either way.
 
+## Experiment result — planning tier (recorded 2026-08-24, same day)
+
+The zero-cost planning tier FAILED INFRASTRUCTURALLY before quality could be
+measured: two consecutive planning runs (each ~30 turns / ~17k output tokens in)
+died on mid-stream stalls — 6 stream events then 120s of silence, malformed
+non-streaming retry — and the lane's usage-limit detector backed off. Verdict:
+free-tier hosted streams do not sustain planning-length generations. Per the
+pre-registered rule, planning re-tiered to the frontier default the same day.
+Escalation remains on the zero-cost ladder (shorter generations; separately
+measured). docs/PROCESS.md must report this outcome as the experiment's finding.
+
 ## Human-gated (never resolved by the loop)
 
 - Publishing: remote creation, repo name confirmation, license (default
