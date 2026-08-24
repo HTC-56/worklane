@@ -49,5 +49,5 @@ the four data paths its panels draw from. Grep your section in
 - [x] **D2** The page is self-contained — create `test/dashboard/self-contained.test.ts`, mirroring `test/dashboard/page.test.ts`; asserts on `dashboardHtml()`. 5 assertions. Spec: §D2.
 - [x] **D3** Live progress, the way the bars read it — create `test/dashboard/progress.test.ts`, mirroring `test/http/events.test.ts`. 4 assertions. Spec: §D3.
 - [x] **D4** Dead-letter panel and its requeue button — create `test/dashboard/dead-letter.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §D4.
-- [ ] **D5** The worker lease table — create `test/dashboard/workers.test.ts`, mirroring `test/http/ops.test.ts`. 4 assertions. Spec: §D5.
+- [x] **D5** The worker lease table — create `test/dashboard/workers.test.ts`, mirroring `test/http/ops.test.ts`. 4 assertions. Spec: §D5.
 - [ ] **D6** Phase verify — run `bash scripts/verify.sh`, append a Phase D section to `STATUS.md`, flip ROADMAP row 8 to SHIPPED. Spec: §D6.
