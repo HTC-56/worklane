@@ -11,9 +11,11 @@ import {
   type JobState,
   type KillSignal,
   type QueueStats,
+  type TypeStat,
   type WorkerRecord,
 } from "../types.js";
 import { DuplicateJobError, UnknownParentError } from "../errors.js";
+import { jobEvent, type JobEventKind, type JobEventSink } from "../events.js";
 
 interface JobRow {
   id: number;
@@ -91,6 +93,7 @@ export class Queue {
   private readonly db: Database.Database;
   private readonly config: Config;
   private dispatcher: CancelDispatcher | null = null;
+  private sink: JobEventSink | null = null;
 
   constructor(db: Database.Database, config: Config, dispatcher?: CancelDispatcher) {
     this.db = db;
@@ -101,6 +104,14 @@ export class Queue {
   /** Lets a worker pool register itself after construction. */
   setCancelDispatcher(dispatcher: CancelDispatcher | null): void {
     this.dispatcher = dispatcher;
+  }
+
+  /**
+   * Where transitions go. Without a sink the queue is silent, which is what
+   * every unit test that predates the ops surface expects.
+   */
+  setEventSink(sink: JobEventSink | null): void {
+    this.sink = sink;
   }
 
   enqueue(input: EnqueueInput): Job {
@@ -147,6 +158,7 @@ export class Queue {
 
     const job = this.getById(Number(result.lastInsertRowid));
     if (!job) throw new Error("enqueue failed to read the job back");
+    this.publish("enqueued", job);
     return job;
   }
 
@@ -197,7 +209,9 @@ export class Queue {
       return this.getById(row.id);
     });
 
-    return claim(Date.now());
+    const claimed = claim(Date.now());
+    if (claimed) this.publish("claimed", claimed);
+    return claimed;
   }
 
   /** Moves a leased job into RUNNING. Returns null if the lease was lost. */
@@ -210,7 +224,8 @@ export class Queue {
           WHERE id = ? AND worker_id = ? AND state = 'CLAIMED'`,
       )
       .run(now, now, jobId, workerId);
-    return result.changes > 0 ? this.getById(jobId) : null;
+    if (result.changes === 0) return null;
+    return this.publishById("started", jobId);
   }
 
   /** Extends the lease. False means the lease was lost and work should stop. */
@@ -244,7 +259,7 @@ export class Queue {
       .run(now, now, jobId, workerId);
     if (result.changes === 0) return null;
     this.clearWorkerClaim(workerId);
-    return this.getById(jobId);
+    return this.publishById("succeeded", jobId);
   }
 
   /**
@@ -282,7 +297,10 @@ export class Queue {
     }
 
     this.clearWorkerClaim(workerId);
-    return this.getById(jobId);
+    return this.publishById(
+      attempts >= job.maxAttempts ? "dead_letter" : "failed",
+      jobId,
+    );
   }
 
   /** Fails a job outright, skipping the retry ladder (e.g. no such handler). */
@@ -310,7 +328,7 @@ export class Queue {
 
     this.clearWorkerClaim(workerId);
     this._cascadeDeadLetterChildren(jobId);
-    return this.getById(jobId);
+    return this.publishById("dead_letter", jobId);
   }
 
   /** Hands a job back untouched — used when a worker shuts down mid-job. */
@@ -326,7 +344,7 @@ export class Queue {
       .run(now, jobId, workerId);
     if (result.changes === 0) return null;
     this.clearWorkerClaim(workerId);
-    return this.getById(jobId);
+    return this.publishById("released", jobId);
   }
 
   /** Records that a running job was killed, naming the signal that did it. */
@@ -347,7 +365,7 @@ export class Queue {
 
     this.clearWorkerClaim(workerId);
     this._cascadeCancelChildren(jobId);
-    return this.getById(jobId);
+    return this.publishById("cancelled", jobId);
   }
 
   /**
@@ -377,6 +395,7 @@ export class Queue {
         .run(now, now, jobId);
       if (job.workerId) this.clearWorkerClaim(job.workerId);
       this._cascadeCancelChildren(jobId);
+      this.publishById("cancelled", jobId);
     }
 
     return { jobId, signal: "NONE", wasRunning: false };
@@ -393,7 +412,8 @@ export class Queue {
           WHERE id = ? AND state = 'DEAD_LETTER'`,
       )
       .run(now, jobId);
-    return result.changes > 0 ? this.getById(jobId) : null;
+    if (result.changes === 0) return null;
+    return this.publishById("requeued", jobId);
   }
 
   updateProgress(
@@ -411,6 +431,7 @@ export class Queue {
           WHERE id = ? AND worker_id = ? AND state = 'RUNNING'`,
       )
       .run(done, total, note ?? null, now, jobId, workerId);
+    if (result.changes > 0) this.publishById("progress", jobId);
     return result.changes > 0;
   }
 
@@ -437,6 +458,7 @@ export class Queue {
    */
   releaseStaleLeases(): number {
     const now = Date.now();
+    const reclaimed: number[] = [];
     const reclaim = this.db.transaction((): number => {
       const stale = this.db
         .prepare(
@@ -456,11 +478,14 @@ export class Queue {
           )
           .run(now, row.id);
         if (row.worker_id) this.clearWorkerClaim(row.worker_id);
+        reclaimed.push(row.id);
       }
       return stale.length;
     });
 
-    return reclaim();
+    const count = reclaim();
+    for (const id of reclaimed) this.publishById("released", id);
+    return count;
   }
 
   getStats(): QueueStats {
@@ -482,6 +507,56 @@ export class Queue {
       if (key) stats[key] = row.count;
     }
     return stats;
+  }
+
+  /**
+   * Per-type counts plus throughput: how many of that type succeeded inside
+   * `windowMs`, and how long a successful run takes on average. This is what
+   * the dashboard's throughput panel and `/metrics` per-type series read.
+   */
+  byType(windowMs = this.config.throughputWindowMs): TypeStat[] {
+    const since = Date.now() - windowMs;
+    const rows = this.db
+      .prepare(
+        `SELECT type,
+                SUM(state = 'PENDING') AS pending,
+                SUM(state IN ('CLAIMED', 'RUNNING')) AS running,
+                SUM(state = 'SUCCEEDED') AS succeeded,
+                SUM(state = 'FAILED') AS failed,
+                SUM(state = 'DEAD_LETTER') AS dead_letter,
+                SUM(state = 'CANCELLED') AS cancelled,
+                SUM(state = 'SUCCEEDED' AND finished_at >= ?) AS recent,
+                AVG(CASE WHEN state = 'SUCCEEDED'
+                          AND started_at IS NOT NULL
+                          AND finished_at IS NOT NULL
+                         THEN finished_at - started_at END) AS avg_ms
+           FROM jobs
+          GROUP BY type
+          ORDER BY type`,
+      )
+      .all(since) as {
+      type: string;
+      pending: number;
+      running: number;
+      succeeded: number;
+      failed: number;
+      dead_letter: number;
+      cancelled: number;
+      recent: number;
+      avg_ms: number | null;
+    }[];
+
+    return rows.map((r) => ({
+      type: r.type,
+      pending: r.pending,
+      running: r.running,
+      succeeded: r.succeeded,
+      failed: r.failed,
+      deadLetter: r.dead_letter,
+      cancelled: r.cancelled,
+      succeededRecently: r.recent,
+      avgDurationMs: r.avg_ms === null ? null : Math.round(r.avg_ms),
+    }));
   }
 
   listJobs(state?: JobState, limit = 100, offset = 0): Job[] {
@@ -566,6 +641,8 @@ export class Queue {
    */
   private _cascadeDeadLetterChildren(parentId: number): void {
     const now = Date.now();
+    const affected = this.childrenToCascade(parentId);
+    if (affected.length === 0) return;
     this.db
       .prepare(
         `UPDATE jobs
@@ -582,6 +659,7 @@ export class Queue {
         now,
         parentId,
       );
+    for (const id of affected) this.publishById("dead_letter", id);
   }
 
   /**
@@ -591,6 +669,8 @@ export class Queue {
    */
   private _cascadeCancelChildren(parentId: number): void {
     const now = Date.now();
+    const affected = this.childrenToCascade(parentId);
+    if (affected.length === 0) return;
     this.db
       .prepare(
         `UPDATE jobs
@@ -607,11 +687,37 @@ export class Queue {
         now,
         parentId,
       );
+    for (const id of affected) this.publishById("cancelled", id);
+  }
+
+  /** Ids of the direct children a cascade is about to move. */
+  private childrenToCascade(parentId: number): number[] {
+    const rows = this.db
+      .prepare(
+        `SELECT id FROM jobs
+          WHERE parent_id = ?
+            AND state NOT IN ('SUCCEEDED', 'DEAD_LETTER', 'CANCELLED')`,
+      )
+      .all(parentId) as { id: number }[];
+    return rows.map((r) => r.id);
   }
 
   private clearWorkerClaim(workerId: string): void {
     this.db
       .prepare("UPDATE workers SET claimed_job_id = NULL WHERE id = ?")
       .run(workerId);
+  }
+
+  /** Tells the sink about a transition. Silent when no sink is attached. */
+  private publish(kind: JobEventKind, job: Job): void {
+    if (!this.sink) return;
+    this.sink.publish(jobEvent(kind, job, Date.now()));
+  }
+
+  /** Re-reads a job, announces its transition, and returns it. */
+  private publishById(kind: JobEventKind, jobId: number): Job | null {
+    const job = this.getById(jobId);
+    if (job) this.publish(kind, job);
+    return job;
   }
 }

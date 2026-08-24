@@ -77,6 +77,14 @@ export const ConfigSchema = z.object({
   httpPort: z.number().int().positive().max(65_535).default(8080),
   httpHost: z.string().default("127.0.0.1"),
   bearerToken: z.string().min(16).optional(),
+  /** JSONL audit trail. Empty string turns the ledger off. */
+  ledgerPath: z.string().default("./ledger.jsonl"),
+  /** How many recent events `/events` and the dashboard can replay. */
+  eventBufferSize: z.number().int().positive().max(10_000).default(200),
+  /** SSE keep-alive comment interval, so proxies do not close idle streams. */
+  sseHeartbeatMs: z.number().int().positive().default(15_000),
+  /** Window `/stats` measures per-type throughput over. */
+  throughputWindowMs: z.number().int().positive().default(300_000),
 });
 export type Config = z.infer<typeof ConfigSchema>;
 
@@ -114,6 +122,19 @@ export interface CancelResult {
   jobId: number;
   signal: KillSignal;
   wasRunning: boolean;
+}
+
+/** Per-job-type counts, plus how many succeeded inside the throughput window. */
+export interface TypeStat {
+  type: string;
+  pending: number;
+  running: number;
+  succeeded: number;
+  failed: number;
+  deadLetter: number;
+  cancelled: number;
+  succeededRecently: number;
+  avgDurationMs: number | null;
 }
 
 export interface QueueStats {
