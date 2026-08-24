@@ -4,6 +4,8 @@ A single-box durable job queue on SQLite with real workers, real cancel and a
 live dashboard. One box, one SQLite file, N workers in one process, at-least-once
 delivery.
 
+![Dashboard: four workers in flight with live progress bars, a dead-letter row ready to requeue, the worker lease table and the event stream ticking](docs/dashboard.png)
+
 ## Quickstart
 
 1. Install and build:
