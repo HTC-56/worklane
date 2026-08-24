@@ -1,17 +1,20 @@
+import { resolveConfig } from "./config.js";
+import { ConfigError } from "./errors.js";
 import { createRuntime } from "./runtime.js";
-import { defaultConfig } from "./types.js";
 
 /**
- * The entry point. v1 starts from the built-in defaults; the YAML config file
- * of SPEC feature 9 lands here, replacing `defaultConfig()` with a loader.
+ * The entry point: read the config (`--config <path>`, else `WORKLANE_CONFIG`,
+ * else the built-in defaults), start the runtime, and catch the signals that
+ * should drain it rather than kill it.
  */
 async function main(): Promise<void> {
-  const config = defaultConfig();
+  const { config, source } = resolveConfig(process.argv.slice(2), process.env);
   const runtime = createRuntime(config);
   const address = await runtime.listen();
 
   process.stdout.write(
-    `worklane listening on ${address} — ${String(config.workerCount)} workers, db ${config.dbPath}\n`,
+    `worklane listening on ${address} — ${String(config.workerCount)} workers, ` +
+      `db ${config.dbPath}, config ${source}\n`,
   );
   if (config.bearerToken === undefined) {
     process.stdout.write(
@@ -38,6 +41,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((err: unknown) => {
-  process.stderr.write(`worklane failed to start: ${String(err)}\n`);
+  // A bad config is the operator's typo, not a crash — print it without a stack.
+  const message = err instanceof ConfigError ? err.message : String(err);
+  process.stderr.write(`worklane failed to start: ${message}\n`);
   process.exit(1);
 });

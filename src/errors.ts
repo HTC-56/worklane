@@ -54,3 +54,11 @@ export class ExecFailedError extends Error {
     this.timedOut = timedOut;
   }
 }
+
+/** The config file could not be read, parsed, or validated. */
+export class ConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConfigError";
+  }
+}
