@@ -101,6 +101,11 @@ export class Queue {
     this.dispatcher = dispatcher ?? null;
   }
 
+  /** The underlying handle, for the few callers that need schema-level reads. */
+  get database(): Database.Database {
+    return this.db;
+  }
+
   /** Lets a worker pool register itself after construction. */
   setCancelDispatcher(dispatcher: CancelDispatcher | null): void {
     this.dispatcher = dispatcher;

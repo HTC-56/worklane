@@ -74,7 +74,8 @@ export const ConfigSchema = z.object({
   baseBackoffMs: z.number().int().positive().default(1_000),
   maxBackoffMs: z.number().int().positive().default(60_000),
   killGraceMs: z.number().int().positive().default(5_000),
-  httpPort: z.number().int().positive().max(65_535).default(8080),
+  /** 0 asks the OS for any free port — what the tests bind to. */
+  httpPort: z.number().int().nonnegative().max(65_535).default(8080),
   httpHost: z.string().default("127.0.0.1"),
   bearerToken: z.string().min(16).optional(),
   /** JSONL audit trail. Empty string turns the ledger off. */
