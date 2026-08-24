@@ -65,3 +65,12 @@ planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
   public repo is worse than none. Home: `TASK_PHASE_E.md` §E0.
 - **Phase E's config loader and `docs/PROCESS.md` were carried by the planning
   lane**; E1–E6 are the executor's. Home: `TASK_PHASE_E.md` §E0.
+- **The README carries no hero screenshot**, though SPEC.md §8 calls the
+  dashboard "the README's hero screenshot". Rendering one needs a headless
+  browser (Playwright/Puppeteer), which the spec's own tiny-dependency and
+  no-build-step rules argue against, and a binary asset is not something an
+  unattended loop should author. Left for the human who publishes the repo.
+  Home: this ledger, recorded at project completion.
+- **No git remote is configured** — remote creation, repo name, license and
+  account are human-gated in `DECISIONS.md`, so the final planning commit is
+  local only. Home: this ledger, recorded at project completion.
