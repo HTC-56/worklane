@@ -5,6 +5,7 @@ import type { Queue } from "./db/queue.js";
 import { DuplicateJobError, UnknownParentError } from "./errors.js";
 import type { EventBus } from "./events.js";
 import type { Ledger } from "./ledger.js";
+import { registerDashboardRoutes } from "./routes/dashboard.js";
 import { registerJobRoutes } from "./routes/jobs.js";
 import { registerOpsRoutes } from "./routes/ops.js";
 import type { Config } from "./types.js";
@@ -18,8 +19,14 @@ export interface AppDeps {
   version?: string;
 }
 
-/** Routes that answer without a bearer token. A gated health check is useless. */
-const PUBLIC_PATHS = new Set(["/healthz"]);
+/**
+ * Routes that answer without a bearer token. A gated health check is useless,
+ * and the dashboard shell (`/`) carries no queue data — a browser cannot put an
+ * `Authorization` header on a top-level navigation, so gating the page would
+ * make it unreachable exactly when a token is configured. Everything the page
+ * displays it fetches itself, with the header, through the gated routes.
+ */
+const PUBLIC_PATHS = new Set(["/healthz", "/"]);
 
 /** Length-aware constant-time compare, so the token cannot be probed by timing. */
 function secretsMatch(given: string, expected: string): boolean {
@@ -84,6 +91,7 @@ export function createApp(deps: AppDeps): FastifyInstance {
     return reply.code(404).send({ error: `no route for ${request.url}` });
   });
 
+  registerDashboardRoutes(app);
   registerJobRoutes(app, queue);
   registerOpsRoutes(app, {
     queue,
