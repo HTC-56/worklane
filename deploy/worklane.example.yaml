@@ -1,0 +1,66 @@
+# worklane configuration.
+#
+# Every key below is optional — leaving one out keeps the default shown here.
+# The file is a flat map of `key: value` scalars: no nesting, no lists, no
+# anchors. Anything else is a startup error naming the line, never a silent
+# misreading. Point the server at this file with:
+#
+#   node dist/server.js --config /etc/worklane/worklane.yaml
+#
+# or by setting WORKLANE_CONFIG to its path.
+
+# --- storage -----------------------------------------------------------------
+
+# The SQLite file. It is created on first start, along with its -wal and -shm
+# siblings; back up all three together, or none of them.
+dbPath: ./worklane.sqlite
+
+# JSONL audit trail of every job transition. Set to "" to turn it off.
+ledgerPath: ./ledger.jsonl
+
+# --- workers and leases ------------------------------------------------------
+
+# How many workers run in this process. One box, one process (SPEC non-goal:
+# nothing distributed) — size this to the work, not to the machine.
+workerCount: 4
+
+# A claimed job is the worker's for this long; the worker renews it on every
+# heartbeat. A worker that dies stops renewing and the job returns to the queue
+# once the lease lapses — this is what makes delivery at-least-once.
+leaseDurationMs: 30000
+heartbeatIntervalMs: 5000
+
+# How long an idle worker waits before looking for work again.
+pollIntervalMs: 100
+
+# --- retries -----------------------------------------------------------------
+
+# Attempts before a job dead-letters, and the exponential backoff (with jitter)
+# between them, clamped at maxBackoffMs.
+defaultMaxAttempts: 3
+baseBackoffMs: 1000
+maxBackoffMs: 60000
+
+# Cancelling a RUNNING exec job sends SIGTERM, waits this long, then SIGKILLs.
+killGraceMs: 5000
+
+# --- http --------------------------------------------------------------------
+
+# 0 asks the OS for any free port. Bind to 127.0.0.1 unless a bearer token is
+# set and something in front of it terminates TLS.
+httpPort: 8080
+httpHost: 127.0.0.1
+
+# One static bearer token guards every route except /healthz and the dashboard
+# shell at /. At least 16 characters. Commented out here because an example
+# token in a public repo is worse than none: generate your own with
+# `openssl rand -hex 24` before exposing the port.
+# bearerToken: "replace-me-with-24-random-bytes"
+
+# How many recent events /events and the dashboard can replay on connect, and
+# how often the SSE stream emits a keep-alive so proxies leave it open.
+eventBufferSize: 200
+sseHeartbeatMs: 15000
+
+# The window /stats measures per-type throughput over.
+throughputWindowMs: 300000
