@@ -61,7 +61,7 @@ systemd unit, the README quickstart, and CI. Grep your section in
 `TASK_PHASE_E.md`, read it, build it. Gate for every task:
 `pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
 
-- [ ] **E1** The config loader, proven — create `test/config/load.test.ts`, mirroring `test/db/queue.test.ts`. 6 assertions. Spec: `TASK_PHASE_E.md` §E1.
+- [x] **E1** The config loader, proven — create `test/config/load.test.ts`, mirroring `test/db/queue.test.ts`. 6 assertions. Spec: `TASK_PHASE_E.md` §E1.
 - [ ] **E2** The systemd unit — create `deploy/worklane.service`, matching the comment style of `deploy/worklane.example.yaml`. Spec: §E2.
 - [ ] **E3** The README — create `README.md`, matching the register of `docs/PROCESS.md`. Gate is `bash scripts/verify.sh` (it lints the quickstart). Spec: §E3.
 - [ ] **E4** Continuous integration — create `.github/workflows/ci.yml`: one job, pnpm 9 + Node 22, running `bash scripts/verify.sh`. Spec: §E4.
