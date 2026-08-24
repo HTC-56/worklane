@@ -269,6 +269,7 @@ export class Queue {
             WHERE id = ?`,
         )
         .run(attempts, error, trail, now, now, jobId);
+      this._cascadeDeadLetterChildren(jobId);
     } else {
       this.db
         .prepare(
@@ -308,6 +309,7 @@ export class Queue {
       );
 
     this.clearWorkerClaim(workerId);
+    this._cascadeDeadLetterChildren(jobId);
     return this.getById(jobId);
   }
 
@@ -555,6 +557,31 @@ export class Queue {
     const capped = Math.min(raw, this.config.maxBackoffMs);
     const jitter = Math.random() * Math.min(capped, this.config.baseBackoffMs);
     return Math.floor(capped + jitter);
+  }
+
+  /**
+   * When a job reaches DEAD_LETTER, every direct child that isn't already in a
+   * terminal state also flips to DEAD_LETTER. Terminal states (SUCCEEDED,
+   * DEAD_LETTER, CANCELLED) are left alone. One level only — no recursion.
+   */
+  private _cascadeDeadLetterChildren(parentId: number): void {
+    const now = Date.now();
+    this.db
+      .prepare(
+        `UPDATE jobs
+            SET state = 'DEAD_LETTER', last_error = ?, error_trail = ?,
+                updated_at = ?, finished_at = ?,
+                lease_until = NULL, worker_id = NULL, run_after = NULL
+          WHERE parent_id = ?
+            AND state NOT IN ('SUCCEEDED', 'DEAD_LETTER', 'CANCELLED')`,
+      )
+      .run(
+        `dead-lettered (parent ${parentId})`,
+        JSON.stringify([`dead-lettered (parent ${parentId})`]),
+        now,
+        now,
+        parentId,
+      );
   }
 
   /**
