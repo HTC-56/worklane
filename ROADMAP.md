@@ -5,12 +5,12 @@ here are the one permitted exception to append-only docs.
 
 | # | Feature (SPEC.md) | Status | Phase | Note |
 |---|---|---|---|---|
-| 1 | Durable queue on SQLite (WAL) | PARTIAL | A | WAL schema, priority, dedupe-while-in-flight, runAfter; queue-level tests in B |
-| 2 | Worker claim loop (lease/heartbeat) | PARTIAL | A | claim + heartbeat + stale-lease recovery built; lapse test in B |
+| 1 | Durable queue on SQLite (WAL) | SHIPPED | B | proven by `test/db/queue.test.ts` |
+| 2 | Worker claim loop (lease/heartbeat) | SHIPPED | B | proven by `test/db/lease.test.ts` |
 | 3 | Command execution (exec handler) | SHIPPED | A | env allowlist, output tails, timeout; 8 tests |
-| 4 | Retries + dead letter | PARTIAL | A | backoff/DLQ/requeue built, one retry proven; exhaustion + requeue tests in B |
+| 4 | Retries + dead letter | SHIPPED | B | proven by `test/db/retry.test.ts` |
 | 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
-| 6 | Chains (parent/child) | PARTIAL | A | claim gating on parent SUCCEEDED built; cascade + tests in B |
+| 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | NOT BUILT | — | |
 | 8 | Dashboard | NOT BUILT | — | |
 | 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |

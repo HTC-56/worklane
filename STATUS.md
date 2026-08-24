@@ -28,3 +28,19 @@ job records `cancelled by SIGKILL`.
 Not yet proven by tests, and therefore left PARTIAL on the scoreboard: enqueue
 dedupe rejection, lease-lapse recovery, dead-letter exhaustion and requeue,
 chain claim gating. Those are Phase B, which is the executor's first phase.
+
+## Phase B — prove the queue (2026-08-24)
+
+Proved: dead-letter cascade to direct children, parent/child claim gating, lease
+lapse recovery, retry ladder with exponential backoff and jitter, dedupe on
+enqueue. Six test files, 27 assertions, all over real child processes where
+applicable.
+
+- `test/db/queue.test.ts` (6) — enqueue with priority, dedupe, parent validation.
+- `test/db/retry.test.ts` (5) — retry ladder, dead letter, requeue.
+- `test/db/lease.test.ts` (4) — stale lease returns job to queue.
+- `test/db/chains.test.ts` (4) — child waits for parent.
+- `test/db/chains-cascade.test.ts` (4) — cancel cascades to direct children.
+- `test/db/chains-dlq.test.ts` (4) — dead-letter cascades to direct children.
+
+Gates: `pnpm typecheck` clean, 46 tests green, `scrub-check` clean.

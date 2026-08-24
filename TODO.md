@@ -19,4 +19,4 @@ covers what its tests do not, and finishes chains. Grep your section in
 - [x] **B4** A child waits for its parent — create `test/db/chains.test.ts`, mirroring `test/db/queue.test.ts`. 4 assertions. Spec: §B4.
 - [x] **B5** Cancelling a job cancels its children — edit `src/db/queue.ts` (mirror its own `markCancelled`), create `test/db/chains-cascade.test.ts`. 4 assertions. Spec: §B5.
 - [x] **B6** Dead-lettering a job dead-letters its children — edit `src/db/queue.ts` (mirror §B5's new method), create `test/db/chains-dlq.test.ts`. 4 assertions. Spec: §B6.
-- [ ] **B7** Phase verify — run `bash scripts/verify.sh`, append a Phase B section to `STATUS.md`, flip ROADMAP rows 1, 2, 4, 6 to SHIPPED. Spec: §B7.
+- [x] **B7** Phase verify — run `bash scripts/verify.sh`, append a Phase B section to `STATUS.md`, flip ROADMAP rows 1, 2, 4, 6 to SHIPPED. Spec: §B7.
