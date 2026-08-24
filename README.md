@@ -1,5 +1,7 @@
 # worklane
 
+[![ci](https://github.com/HTC-56/worklane/actions/workflows/ci.yml/badge.svg)](https://github.com/HTC-56/worklane/actions/workflows/ci.yml)
+
 A single-box durable job queue on SQLite with real workers, real cancel and a
 live dashboard. One box, one SQLite file, N workers in one process, at-least-once
 delivery.
