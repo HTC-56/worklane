@@ -7,3 +7,8 @@ coverage/
 ledger.jsonl
 .loop-paused
 .escalate-rung
+loop-ledger.tsv
+.plan-stamps/
+.plan-lock/
+.scrub-denylist
+BLOCKED.md
