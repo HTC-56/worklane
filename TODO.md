@@ -46,7 +46,7 @@ the four data paths its panels draw from. Grep your section in
 `pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
 
 - [x] **D1** The dashboard shell on `GET /` — create `test/dashboard/page.test.ts`, mirroring `test/http/ops.test.ts`. 5 assertions. Spec: `TASK_PHASE_D.md` §D1.
-- [ ] **D2** The page is self-contained — create `test/dashboard/self-contained.test.ts`, mirroring `test/dashboard/page.test.ts`; asserts on `dashboardHtml()`. 5 assertions. Spec: §D2.
+- [x] **D2** The page is self-contained — create `test/dashboard/self-contained.test.ts`, mirroring `test/dashboard/page.test.ts`; asserts on `dashboardHtml()`. 5 assertions. Spec: §D2.
 - [ ] **D3** Live progress, the way the bars read it — create `test/dashboard/progress.test.ts`, mirroring `test/http/events.test.ts`. 4 assertions. Spec: §D3.
 - [ ] **D4** Dead-letter panel and its requeue button — create `test/dashboard/dead-letter.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §D4.
 - [ ] **D5** The worker lease table — create `test/dashboard/workers.test.ts`, mirroring `test/http/ops.test.ts`. 4 assertions. Spec: §D5.
