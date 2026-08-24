@@ -11,7 +11,7 @@ here are the one permitted exception to append-only docs.
 | 4 | Retries + dead letter | SHIPPED | B | proven by `test/db/retry.test.ts` |
 | 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
-| 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | NOT BUILT | — | |
+| 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | PARTIAL | C | built by `C0a`–`C0d`; tests are C1–C5, the progress-reporting demo handler is C6 |
 | 8 | Dashboard | NOT BUILT | — | |
 | 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |
@@ -33,3 +33,17 @@ planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
   the executor can act on. Home: `TASK_PHASE_A.md` §A0.
 - **Phase A was carried by the planning lane, not the executor** — the code was
   already written when the phase was planned. Home: `TASK_PHASE_A.md` §A0.
+- **`/healthz` is the only unauthenticated route** — every other route is 401
+  without the bearer token when one is configured. Home: `TASK_PHASE_C.md` §C0.
+- **`/events` authenticates by header**, so the dashboard must read the stream
+  with `fetch`, not `EventSource`. Home: `TASK_PHASE_C.md` §C0.
+- **`GET /jobs/:id` answers `{ job, children }`** — chain inspection needs no
+  verb of its own. Home: `TASK_PHASE_C.md` §C0.
+- **Ledger appends are synchronous**; a failed append increments
+  `writeFailures` and is never thrown at a running job. Home:
+  `TASK_PHASE_C.md` §C0.
+- **`httpPort: 0` means "any free port"** — how the HTTP tests bind. Home:
+  `TASK_PHASE_C.md` §C0.
+- **Phase C's HTTP layer was carried by the planning lane** — six interlocking
+  files do not fit one local session; C1–C6 are the executor's.
+  Home: `TASK_PHASE_C.md` §C0.
