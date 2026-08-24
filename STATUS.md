@@ -61,3 +61,20 @@ and a demo progress-reporting handler. Six test files, 27 assertions.
 - `test/handlers/demo.test.ts` (4) — demo handler that reports progress.
 
 Gates: `pnpm typecheck` clean, 73 tests green, `scrub-check` clean.
+
+## Phase D — the dashboard, proven (2026-08-24)
+
+Proved: the self-contained dashboard shell on `GET /`, its live progress bars,
+dead-letter panel with requeue button, and the worker lease table. Five test
+files, 22 assertions.
+
+- `test/dashboard/page.test.ts` (5) — dashboard HTML shell on `GET /`.
+- `test/dashboard/self-contained.test.ts` (5) — zero external requests in the
+  dashboard HTML.
+- `test/dashboard/progress.test.ts` (4) — live progress bars read from the
+  jobs endpoint.
+- `test/dashboard/dead-letter.test.ts` (4) — dead-letter panel and its
+  requeue button.
+- `test/dashboard/workers.test.ts` (4) — worker lease table on the dashboard.
+
+Gates: `pnpm typecheck` clean, 93 tests green, `scrub-check` clean.

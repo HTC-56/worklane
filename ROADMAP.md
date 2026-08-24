@@ -12,7 +12,7 @@ here are the one permitted exception to append-only docs.
 | 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | SHIPPED | C | proven by `test/http/verbs.test.ts`, `test/http/auth.test.ts`, `test/http/cancel-requeue.test.ts`, `test/http/ops.test.ts`, `test/http/events.test.ts`, `test/handlers/demo.test.ts` |
-| 8 | Dashboard | PARTIAL | D | page built and served on `GET /` (`feat(D0)`); its tests are Phase D |
+| 8 | Dashboard | SHIPPED | D | proven by `test/dashboard/page.test.ts`, `test/dashboard/self-contained.test.ts`, `test/dashboard/progress.test.ts`, `test/dashboard/dead-letter.test.ts`, `test/dashboard/workers.test.ts` |
 | 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |
 
