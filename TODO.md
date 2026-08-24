@@ -51,3 +51,19 @@ the four data paths its panels draw from. Grep your section in
 - [x] **D4** Dead-letter panel and its requeue button — create `test/dashboard/dead-letter.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §D4.
 - [x] **D5** The worker lease table — create `test/dashboard/workers.test.ts`, mirroring `test/http/ops.test.ts`. 4 assertions. Spec: §D5.
 - [x] **D6** Phase verify — run `bash scripts/verify.sh`, append a Phase D section to `STATUS.md`, flip ROADMAP row 8 to SHIPPED. Spec: §D6.
+
+## Phase E: deploy-grade packaging — see TASK_PHASE_E.md
+
+The YAML config loader (`src/config.ts`), the shipped example config and
+`docs/PROCESS.md` are committed and green — `TASK_PHASE_E.md` §E0 says what
+exists. These tasks prove the loader and write the packaging around it: the
+systemd unit, the README quickstart, and CI. Grep your section in
+`TASK_PHASE_E.md`, read it, build it. Gate for every task:
+`pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
+
+- [ ] **E1** The config loader, proven — create `test/config/load.test.ts`, mirroring `test/db/queue.test.ts`. 6 assertions. Spec: `TASK_PHASE_E.md` §E1.
+- [ ] **E2** The systemd unit — create `deploy/worklane.service`, matching the comment style of `deploy/worklane.example.yaml`. Spec: §E2.
+- [ ] **E3** The README — create `README.md`, matching the register of `docs/PROCESS.md`. Gate is `bash scripts/verify.sh` (it lints the quickstart). Spec: §E3.
+- [ ] **E4** Continuous integration — create `.github/workflows/ci.yml`: one job, pnpm 9 + Node 22, running `bash scripts/verify.sh`. Spec: §E4.
+- [ ] **E5** The packaging, proven — create `test/deploy/packaging.test.ts`, mirroring `test/dashboard/self-contained.test.ts`. 5 assertions. Spec: §E5.
+- [ ] **E6** Phase verify — run `bash scripts/verify.sh`, append a Phase E section to `STATUS.md`, flip ROADMAP row 9 to SHIPPED. Spec: §E6.

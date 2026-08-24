@@ -13,8 +13,8 @@ here are the one permitted exception to append-only docs.
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | SHIPPED | C | proven by `test/http/verbs.test.ts`, `test/http/auth.test.ts`, `test/http/cancel-requeue.test.ts`, `test/http/ops.test.ts`, `test/http/events.test.ts`, `test/handlers/demo.test.ts` |
 | 8 | Dashboard | SHIPPED | D | proven by `test/dashboard/page.test.ts`, `test/dashboard/self-contained.test.ts`, `test/dashboard/progress.test.ts`, `test/dashboard/dead-letter.test.ts`, `test/dashboard/workers.test.ts` |
-| 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
-| — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |
+| 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | E | YAML config loader + example shipped (`src/config.ts`); systemd unit, README, CI are E2–E4 |
+| — | docs/PROCESS.md (loop story + planning-tier experiment) | SHIPPED | E | the loop, the ledger split, and the planning-tier null result |
 
 When every row reads SHIPPED and verify.sh is green, the project is done — the
 planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
@@ -51,3 +51,17 @@ planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
 - **Phase C's HTTP layer was carried by the planning lane** — six interlocking
   files do not fit one local session; C1–C6 are the executor's.
   Home: `TASK_PHASE_C.md` §C0.
+- **The YAML config is a documented flat-map subset, not a parser dependency** —
+  one `key: value` scalar per line; indentation, sequences, inline collections,
+  anchors and block scalars each raise a `ConfigError` naming the line, and an
+  unknown key is rejected rather than ignored. Home: `TASK_PHASE_E.md` §E0.
+- **Config precedence is `--config <path>` > `WORKLANE_CONFIG` > built-in
+  defaults**, and an unrecognised argument is an error, not something ignored.
+  Home: `TASK_PHASE_E.md` §E0.
+- **`pnpm build` copies the dashboard HTML into `dist/dashboard/`** so a built
+  tree is self-sufficient. A file copy is not a build step for the page — it is
+  still hand-written and served byte-for-byte. Home: `TASK_PHASE_E.md` §E0.
+- **The shipped example config carries no bearer token** — an example token in a
+  public repo is worse than none. Home: `TASK_PHASE_E.md` §E0.
+- **Phase E's config loader and `docs/PROCESS.md` were carried by the planning
+  lane**; E1–E6 are the executor's. Home: `TASK_PHASE_E.md` §E0.
