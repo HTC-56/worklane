@@ -30,7 +30,7 @@ Grep your section in `TASK_PHASE_C.md`, read it, build it. Gate for every task:
 `pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
 
 - [x] **C1** Enqueue and inspect over HTTP — create `test/http/verbs.test.ts`, mirroring `test/db/queue.test.ts`. 6 assertions. Spec: `TASK_PHASE_C.md` §C1.
-- [ ] **C2** The bearer token — create `test/http/auth.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §C2.
+- [x] **C2** The bearer token — create `test/http/auth.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §C2.
 - [ ] **C3** Cancel and requeue over HTTP — create `test/http/cancel-requeue.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §C3.
 - [ ] **C4** healthz, stats and Prometheus metrics — create `test/http/ops.test.ts`, mirroring `test/http/verbs.test.ts`. 5 assertions. Spec: §C4.
 - [ ] **C5** SSE stream and JSONL ledger — create `test/http/events.test.ts`, mirroring `test/http/verbs.test.ts`; uses `listenTestApp` + `readSseEvents`. 4 assertions. Spec: §C5.
