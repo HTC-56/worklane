@@ -5,6 +5,7 @@ import { createDatabase, createQueue } from "./db/index.js";
 import type { Queue } from "./db/queue.js";
 import { EventBus } from "./events.js";
 import { createExecHandler } from "./handlers/exec.js";
+import { createDemoHandler } from "./handlers/demo.js";
 import { Ledger } from "./ledger.js";
 import type { Config, Handler } from "./types.js";
 import { RunningJobs } from "./workers/running-jobs.js";
@@ -41,7 +42,7 @@ export function createRuntime(config: Config, extraHandlers: Handler[] = []): Ru
   queue.setEventSink(bus);
 
   const handlers = new Map<string, Handler>();
-  for (const handler of [createExecHandler(config), ...extraHandlers]) {
+  for (const handler of [createExecHandler(config), createDemoHandler(), ...extraHandlers]) {
     handlers.set(handler.type, handler);
   }
 
