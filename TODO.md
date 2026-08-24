@@ -63,7 +63,7 @@ systemd unit, the README quickstart, and CI. Grep your section in
 
 - [x] **E1** The config loader, proven — create `test/config/load.test.ts`, mirroring `test/db/queue.test.ts`. 6 assertions. Spec: `TASK_PHASE_E.md` §E1.
 - [x] **E2** The systemd unit — create `deploy/worklane.service`, matching the comment style of `deploy/worklane.example.yaml`. Spec: §E2.
-- [ ] **E3** The README — create `README.md`, matching the register of `docs/PROCESS.md`. Gate is `bash scripts/verify.sh` (it lints the quickstart). Spec: §E3.
+- [x] **E3** The README — create `README.md`, matching the register of `docs/PROCESS.md`. Gate is `bash scripts/verify.sh` (it lints the quickstart). Spec: §E3.
 - [ ] **E4** Continuous integration — create `.github/workflows/ci.yml`: one job, pnpm 9 + Node 22, running `bash scripts/verify.sh`. Spec: §E4.
 - [ ] **E5** The packaging, proven — create `test/deploy/packaging.test.ts`, mirroring `test/dashboard/self-contained.test.ts`. 5 assertions. Spec: §E5.
 - [ ] **E6** Phase verify — run `bash scripts/verify.sh`, append a Phase E section to `STATUS.md`, flip ROADMAP row 9 to SHIPPED. Spec: §E6.
