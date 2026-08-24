@@ -78,3 +78,20 @@ files, 22 assertions.
 - `test/dashboard/workers.test.ts` (4) — worker lease table on the dashboard.
 
 Gates: `pnpm typecheck` clean, 93 tests green, `scrub-check` clean.
+
+## Phase E — deploy-grade packaging (2026-08-24)
+
+Proved: the YAML config loader, the shipped example config, the systemd unit,
+the README quickstart, and the CI workflow. Five test files and one
+integration gate, 104 assertions total.
+
+- `test/config/load.test.ts` (6) — scalar parsing, file loading, error cases,
+  config resolution precedence.
+- `deploy/worklane.service` — systemd unit file with drain on SIGTERM.
+- `README.md` — quickstart and reference matching `docs/PROCESS.md` register.
+- `.github/workflows/ci.yml` — one-job CI running `bash scripts/verify.sh`.
+- `test/deploy/packaging.test.ts` (5) — example config ships no token, systemd
+  unit has required directives, CI has correct toolchain, README passes lint.
+
+Gates: `pnpm typecheck` clean, 104 tests green, `scrub-check` clean. Every
+ROADMAP row now reads SHIPPED.

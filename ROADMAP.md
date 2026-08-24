@@ -13,7 +13,7 @@ here are the one permitted exception to append-only docs.
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | SHIPPED | C | proven by `test/http/verbs.test.ts`, `test/http/auth.test.ts`, `test/http/cancel-requeue.test.ts`, `test/http/ops.test.ts`, `test/http/events.test.ts`, `test/handlers/demo.test.ts` |
 | 8 | Dashboard | SHIPPED | D | proven by `test/dashboard/page.test.ts`, `test/dashboard/self-contained.test.ts`, `test/dashboard/progress.test.ts`, `test/dashboard/dead-letter.test.ts`, `test/dashboard/workers.test.ts` |
-| 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | E | YAML config loader + example shipped (`src/config.ts`); systemd unit, README, CI are E2–E4 |
+| 9 | Deploy-grade packaging (config, unit, README, CI) | SHIPPED | E | YAML config loader, systemd unit, README quickstart, CI workflow |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | SHIPPED | E | the loop, the ledger split, and the planning-tier null result |
 
 When every row reads SHIPPED and verify.sh is green, the project is done — the

@@ -66,4 +66,4 @@ systemd unit, the README quickstart, and CI. Grep your section in
 - [x] **E3** The README — create `README.md`, matching the register of `docs/PROCESS.md`. Gate is `bash scripts/verify.sh` (it lints the quickstart). Spec: §E3.
 - [x] **E4** Continuous integration — create `.github/workflows/ci.yml`: one job, pnpm 9 + Node 22, running `bash scripts/verify.sh`. Spec: §E4.
 - [x] **E5** The packaging, proven — create `test/deploy/packaging.test.ts`, mirroring `test/dashboard/self-contained.test.ts`. 5 assertions. Spec: §E5.
-- [ ] **E6** Phase verify — run `bash scripts/verify.sh`, append a Phase E section to `STATUS.md`, flip ROADMAP row 9 to SHIPPED. Spec: §E6.
+- [x] **E6** Phase verify — run `bash scripts/verify.sh`, append a Phase E section to `STATUS.md`, flip ROADMAP row 9 to SHIPPED. Spec: §E6.
