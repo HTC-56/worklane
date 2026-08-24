@@ -5,15 +5,15 @@ here are the one permitted exception to append-only docs.
 
 | # | Feature (SPEC.md) | Status | Phase | Note |
 |---|---|---|---|---|
-| 1 | Durable queue on SQLite (WAL) | NOT BUILT | — | |
-| 2 | Worker claim loop (lease/heartbeat) | NOT BUILT | — | |
-| 3 | Command execution (exec handler) | NOT BUILT | — | |
-| 4 | Retries + dead letter | NOT BUILT | — | |
-| 5 | Real cancel (SIGTERM→SIGKILL, recorded) | NOT BUILT | — | |
-| 6 | Chains (parent/child) | NOT BUILT | — | |
+| 1 | Durable queue on SQLite (WAL) | PARTIAL | A | WAL schema, priority, dedupe-while-in-flight, runAfter; queue-level tests in B |
+| 2 | Worker claim loop (lease/heartbeat) | PARTIAL | A | claim + heartbeat + stale-lease recovery built; lapse test in B |
+| 3 | Command execution (exec handler) | SHIPPED | A | env allowlist, output tails, timeout; 8 tests |
+| 4 | Retries + dead letter | PARTIAL | A | backoff/DLQ/requeue built, one retry proven; exhaustion + requeue tests in B |
+| 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
+| 6 | Chains (parent/child) | PARTIAL | A | claim gating on parent SUCCEEDED built; cascade + tests in B |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | NOT BUILT | — | |
 | 8 | Dashboard | NOT BUILT | — | |
-| 9 | Deploy-grade packaging (config, unit, README, CI) | NOT BUILT | — | |
+| 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |
 
 When every row reads SHIPPED and verify.sh is green, the project is done — the
@@ -21,4 +21,15 @@ planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
 
 ## Reservations ledger — small deferred calls recorded inside phase specs
 
-*(empty at scaffold; each entry names its home)*
+- **State `FAILED` = retry scheduled** (claimable once `run_after` passes);
+  `DEAD_LETTER` = attempts exhausted. Home: `TASK_PHASE_A.md` §A0.
+- **Dedupe keys are reserved only while a job is in flight** — partial unique
+  index, key reusable after a terminal state. Home: `TASK_PHASE_A.md` §A0.
+- **Output tails live on the job row** (`stdout_tail`/`stderr_tail`) so the ops
+  surface has somewhere to read them. Home: `TASK_PHASE_A.md` §A0.
+- **Worker shutdown releases the in-flight job to `PENDING`**, attempts
+  untouched. Home: `TASK_PHASE_A.md` §A0.
+- **`exactOptionalPropertyTypes` off, `strict` on** so gate failures are ones
+  the executor can act on. Home: `TASK_PHASE_A.md` §A0.
+- **Phase A was carried by the planning lane, not the executor** — the code was
+  already written when the phase was planned. Home: `TASK_PHASE_A.md` §A0.
