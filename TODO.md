@@ -14,7 +14,7 @@ covers what its tests do not, and finishes chains. Grep your section in
 `pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
 
 - [x] **B1** Enqueue, dedupe and parent validation — create `test/db/queue.test.ts`, mirroring `test/workers/worker.test.ts`. 6 assertions. Spec: `TASK_PHASE_B.md` §B1.
-- [ ] **B2** Retry ladder, dead letter, requeue — create `test/db/retry.test.ts`, mirroring `test/db/queue.test.ts`. 5 assertions. Spec: §B2.
+- [x] **B2** Retry ladder, dead letter, requeue — create `test/db/retry.test.ts`, mirroring `test/db/queue.test.ts`. 5 assertions. Spec: §B2.
 - [ ] **B3** Lease lapse returns a job to the queue — create `test/db/lease.test.ts`, mirroring `test/db/queue.test.ts`. 4 assertions. Spec: §B3.
 - [ ] **B4** A child waits for its parent — create `test/db/chains.test.ts`, mirroring `test/db/queue.test.ts`. 4 assertions. Spec: §B4.
 - [ ] **B5** Cancelling a job cancels its children — edit `src/db/queue.ts` (mirror its own `markCancelled`), create `test/db/chains-cascade.test.ts`. 4 assertions. Spec: §B5.
