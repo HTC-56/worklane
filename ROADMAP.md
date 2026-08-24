@@ -12,7 +12,7 @@ here are the one permitted exception to append-only docs.
 | 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
 | 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | SHIPPED | C | proven by `test/http/verbs.test.ts`, `test/http/auth.test.ts`, `test/http/cancel-requeue.test.ts`, `test/http/ops.test.ts`, `test/http/events.test.ts`, `test/handlers/demo.test.ts` |
-| 8 | Dashboard | NOT BUILT | — | |
+| 8 | Dashboard | PARTIAL | D | page built and served on `GET /` (`feat(D0)`); its tests are Phase D |
 | 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |
 
@@ -33,8 +33,12 @@ planning lane declares PROJECT SPEC COMPLETE rather than inventing scope.
   the executor can act on. Home: `TASK_PHASE_A.md` §A0.
 - **Phase A was carried by the planning lane, not the executor** — the code was
   already written when the phase was planned. Home: `TASK_PHASE_A.md` §A0.
-- **`/healthz` is the only unauthenticated route** — every other route is 401
-  without the bearer token when one is configured. Home: `TASK_PHASE_C.md` §C0.
+- **`/healthz` is unauthenticated**, and from Phase D so is `GET /` — every
+  other route is 401 without the bearer token when one is configured. The
+  dashboard shell carries no queue data and a browser cannot set a header on a
+  top-level navigation, so gating the page would make it unreachable exactly
+  when a token is set. Home: `TASK_PHASE_C.md` §C0, refined by
+  `TASK_PHASE_D.md` §D0.
 - **`/events` authenticates by header**, so the dashboard must read the stream
   with `fetch`, not `EventSource`. Home: `TASK_PHASE_C.md` §C0.
 - **`GET /jobs/:id` answers `{ job, children }`** — chain inspection needs no

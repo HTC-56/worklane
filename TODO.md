@@ -36,3 +36,18 @@ Grep your section in `TASK_PHASE_C.md`, read it, build it. Gate for every task:
 - [x] **C5** SSE stream and JSONL ledger — create `test/http/events.test.ts`, mirroring `test/http/verbs.test.ts`; uses `listenTestApp` + `readSseEvents`. 4 assertions. Spec: §C5.
 - [x] **C6** Demo handler that reports progress — create `src/handlers/demo.ts` (mirror `src/handlers/exec.ts`), register it in `src/runtime.ts`, create `test/handlers/demo.test.ts`. 4 assertions. Spec: §C6.
 - [x] **C7** Phase verify — run `bash scripts/verify.sh`, append a Phase C section to `STATUS.md`, flip ROADMAP row 7 to SHIPPED. Spec: §C7.
+
+## Phase D: the dashboard — see TASK_PHASE_D.md
+
+`GET /` serves the whole self-contained dashboard page; it is committed and
+green — `TASK_PHASE_D.md` §D0 says what exists. These tasks prove the page and
+the four data paths its panels draw from. Grep your section in
+`TASK_PHASE_D.md`, read it, build it. Gate for every task:
+`pnpm typecheck` + `pnpm test` + `bash scripts/scrub-check.sh`.
+
+- [ ] **D1** The dashboard shell on `GET /` — create `test/dashboard/page.test.ts`, mirroring `test/http/ops.test.ts`. 5 assertions. Spec: `TASK_PHASE_D.md` §D1.
+- [ ] **D2** The page is self-contained — create `test/dashboard/self-contained.test.ts`, mirroring `test/dashboard/page.test.ts`; asserts on `dashboardHtml()`. 5 assertions. Spec: §D2.
+- [ ] **D3** Live progress, the way the bars read it — create `test/dashboard/progress.test.ts`, mirroring `test/http/events.test.ts`. 4 assertions. Spec: §D3.
+- [ ] **D4** Dead-letter panel and its requeue button — create `test/dashboard/dead-letter.test.ts`, mirroring `test/http/verbs.test.ts`. 4 assertions. Spec: §D4.
+- [ ] **D5** The worker lease table — create `test/dashboard/workers.test.ts`, mirroring `test/http/ops.test.ts`. 4 assertions. Spec: §D5.
+- [ ] **D6** Phase verify — run `bash scripts/verify.sh`, append a Phase D section to `STATUS.md`, flip ROADMAP row 8 to SHIPPED. Spec: §D6.
