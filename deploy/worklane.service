@@ -1,0 +1,55 @@
+# worklane systemd unit
+#
+# Install it with three commands:
+#
+#   cp deploy/worklane.service /etc/systemd/system/worklane.service
+#   systemctl daemon-reload
+#   systemctl enable --now worklane.service
+#
+# The config file at /etc/worklane/worklane.yaml must list absolute paths
+# for dbPath and ledgerPath — a relative path would resolve against the
+# working directory (/opt/worklane) and end up in the wrong place.
+#
+# Create the dedicated user first (if it doesn't already exist):
+#
+#   sudo useradd --system --no-create-home --shell /usr/sbin/nologin worklane
+
+[Unit]
+Description=worklane job queue
+After=network.target
+
+[Service]
+Type=simple
+User=worklane
+Group=worklane
+
+WorkingDirectory=/opt/worklane
+ExecStart=/usr/bin/node /opt/worklane/dist/server.js --config /etc/worklane/worklane.yaml
+
+# Let the entry point drain workers on SIGTERM; 30 seconds is enough for a
+# bounded number of in-flight jobs to finish their kill-grace period.
+TimeoutStopSec=30
+
+# Restart on failure, but back off a touch so a crashing worker doesn't
+# spin the CPU.
+Restart=on-failure
+RestartSec=5
+
+# Hardening — no root, no new privileges, locked-down filesystem.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+
+# The SQLite file and the JSONL ledger need a writable home. This overlay
+# gives the service /opt/worklane/state as a private writable directory
+# while the rest of the install tree stays read-only.
+ReadWritePaths=/opt/worklane/state
+
+# Environment — uncomment and adjust if you want to set a bearer token
+# here instead of in the config file.
+# Environment=WORKLANE_BEARER_TOKEN=your-secret-here
+
+[Install]
+WantedBy=multi-user.target
