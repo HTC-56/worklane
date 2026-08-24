@@ -35,4 +35,4 @@ Grep your section in `TASK_PHASE_C.md`, read it, build it. Gate for every task:
 - [x] **C4** healthz, stats and Prometheus metrics — create `test/http/ops.test.ts`, mirroring `test/http/verbs.test.ts`. 5 assertions. Spec: §C4.
 - [x] **C5** SSE stream and JSONL ledger — create `test/http/events.test.ts`, mirroring `test/http/verbs.test.ts`; uses `listenTestApp` + `readSseEvents`. 4 assertions. Spec: §C5.
 - [x] **C6** Demo handler that reports progress — create `src/handlers/demo.ts` (mirror `src/handlers/exec.ts`), register it in `src/runtime.ts`, create `test/handlers/demo.test.ts`. 4 assertions. Spec: §C6.
-- [ ] **C7** Phase verify — run `bash scripts/verify.sh`, append a Phase C section to `STATUS.md`, flip ROADMAP row 7 to SHIPPED. Spec: §C7.
+- [x] **C7** Phase verify — run `bash scripts/verify.sh`, append a Phase C section to `STATUS.md`, flip ROADMAP row 7 to SHIPPED. Spec: §C7.

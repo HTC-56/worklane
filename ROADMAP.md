@@ -11,7 +11,7 @@ here are the one permitted exception to append-only docs.
 | 4 | Retries + dead letter | SHIPPED | B | proven by `test/db/retry.test.ts` |
 | 5 | Real cancel (SIGTERM→SIGKILL, recorded) | SHIPPED | A | proven against a child that ignores SIGTERM; signal recorded on the job |
 | 6 | Chains (parent/child) | SHIPPED | B | proven by `test/db/chains.test.ts` |
-| 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | PARTIAL | C | built by `C0a`–`C0d`; tests are C1–C5, the progress-reporting demo handler is C6 |
+| 7 | Ops surface (verbs, healthz, metrics, SSE, ledger, auth, progress) | SHIPPED | C | proven by `test/http/verbs.test.ts`, `test/http/auth.test.ts`, `test/http/cancel-requeue.test.ts`, `test/http/ops.test.ts`, `test/http/events.test.ts`, `test/handlers/demo.test.ts` |
 | 8 | Dashboard | NOT BUILT | — | |
 | 9 | Deploy-grade packaging (config, unit, README, CI) | PARTIAL | A | scrub-check + verify gates exist; config/unit/README/CI outstanding |
 | — | docs/PROCESS.md (loop story + planning-tier experiment) | NOT BUILT | — | written near the end |

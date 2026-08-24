@@ -44,3 +44,20 @@ applicable.
 - `test/db/chains-dlq.test.ts` (4) — dead-letter cascades to direct children.
 
 Gates: `pnpm typecheck` clean, 46 tests green, `scrub-check` clean.
+
+## Phase C — the ops surface, proven (2026-08-24)
+
+Proved: the HTTP surface — enqueue/inspect verbs, bearer token auth, cancel and
+requeue, healthz/stats/Prometheus metrics, SSE event stream with JSONL ledger,
+and a demo progress-reporting handler. Six test files, 27 assertions.
+
+- `test/http/verbs.test.ts` (6) — enqueue and inspect jobs over HTTP.
+- `test/http/auth.test.ts` (4) — bearer token authentication on every route
+  except `/healthz`.
+- `test/http/cancel-requeue.test.ts` (4) — cancel PENDING, cancel missing,
+  requeue DEAD_LETTER, requeue non-DEAD_LETTER/missing.
+- `test/http/ops.test.ts` (5) — `/healthz`, `/metrics`, `/stats`.
+- `test/http/events.test.ts` (4) — SSE stream and JSONL ledger.
+- `test/handlers/demo.test.ts` (4) — demo handler that reports progress.
+
+Gates: `pnpm typecheck` clean, 73 tests green, `scrub-check` clean.
